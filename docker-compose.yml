@@ -1,0 +1,22 @@
+services:
+  mlflow:
+    image: anujkrpathak/mlops:latest
+    command: mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:////mlflow/mlflow.db --artifacts-destination /mlflow/artifacts
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow-data:/mlflow
+    restart: unless-stopped
+
+  app:
+    image: anujkrpathak/mlops:latest
+    ports:
+      - "8000:8000"
+    environment:
+      - MLFLOW_TRACKING=http://mlflow:5000
+    depends_on:
+      - mlflow
+    restart: unless-stopped
+
+volumes:
+  mlflow-data:
